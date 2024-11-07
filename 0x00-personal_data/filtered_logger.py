@@ -3,9 +3,12 @@
 Module with fxn filter_datum that filters sensitive info from log messages.
 """
 
+from os import environ
 import logging
 import re
+import mysql.connector
 from typing import List, Tuple
+from mysql.connector.connection import MySQLConnection
 
 PII_FIELDS: Tuple[str, ...] = ("name", "email", "phone", "ssn", "password")
 
@@ -78,3 +81,18 @@ def get_logger() -> logging.Logger:
     logger.addHandler(handler)
 
     return logger
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """ Returns connector to a MySQL database """
+    username = environ.get("PERSONAL_DATA_DB_USERNAME", "root")
+    password = environ.get("PERSONAL_DATA_DB_PASSWORD", "")
+    host = environ.get("PERSONAL_DATA_DB_HOST", "localhost")
+    db_name = environ.get("PERSONAL_DATA_DB_NAME")
+
+    connectorr = mysql.connector.connection.MySQLConnection(
+        user=username,
+        password=password,
+        host=host,
+        database=db_name)
+    return connectorr
