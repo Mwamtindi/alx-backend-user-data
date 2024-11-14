@@ -8,8 +8,6 @@ from typing import TypeVar
 import base64
 from models.user import User
 
-#User = TypeVar('User')
-
 
 class BasicAuth(Auth):
     """Basic Authe'n that inherits from Auth and implements Basic Authe'n"""
