@@ -6,8 +6,9 @@ BasicAuth module that inherits from Auth and implements Basic Authentication
 from api.v1.auth.auth import Auth
 from typing import TypeVar
 import base64
+from models.user import User
 
-User = TypeVar('User')
+#User = TypeVar('User')
 
 
 class BasicAuth(Auth):
