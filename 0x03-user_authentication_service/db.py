@@ -50,8 +50,8 @@ class DB:
         self._session.commit()
         return new_user
 
-     def find_user_by(self, **kwargs) -> User:
-         """
+    def find_user_by(self, **kwargs) -> User:
+        """
         Finds a user in the db based on keyword arguments.
 
         Args:
@@ -65,14 +65,17 @@ class DB:
             InvalidRequestError: If query arguments are invalid.
         """
         if not kwargs:
-            raise InvalidRequestError("No query arguments provided.")
+            raise InvalidRequestError
 
-        try:
-            user = self._session.query(User).filter_by(**kwargs).one()
-        except NoResultFound:
-            raise NoResultFound("No user found matching the criteria.")
-        except Exception as e:
-            raise InvalidRequestError(f"Invalid query arguments: {e}")
+        columns = User.__table__.columns.keys()
+        for key in kwargs.keys():
+            if key not in columns:
+                raise InvalidRequestError
+
+        user = self._session.query(User).filter_by(**kwargs).first()
+
+        if user is None:
+            raise NoResultFound
 
         return user
 
@@ -92,9 +95,12 @@ class DB:
         """
         user = self.find_user_by(id=user_id)
 
+        columns = User.__table__.columns.keys()
+        for key in kwargs.keys():
+            if key not in columns:
+                raise ValueError
+
         for key, value in kwargs.items():
-            if not hasattr(user, key):
-                raise ValueError(f"Attribute {key} does not exist on User.")
             setattr(user, key, value)
 
         self._session.commit()
