@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 from user import Base, User
 
-from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.exc import InvalidRequestError, NoResultFound
 from sqlalchemy.orm.exc import NoResultFound
 
 
@@ -64,20 +64,15 @@ class DB:
             NoResultFound: If no user matches the query.
             InvalidRequestError: If query arguments are invalid.
         """
-        if not kwargs:
-            raise InvalidRequestError
-
-        columns = User.__table__.columns.keys()
         for key in kwargs.keys():
-            if key not in columns:
-                raise InvalidRequestError
+            if not hasattr(User, key):
+                raise InvalidRequestError()
 
         user = self._session.query(User).filter_by(**kwargs).first()
 
-        if user is None:
-            raise NoResultFound
-
-        return user
+        if user:
+            return user
+        raise NoResultFound()
 
     def update_user(self, user_id: int, **kwargs) -> None:
         """
